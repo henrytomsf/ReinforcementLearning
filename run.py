@@ -3,6 +3,7 @@ import tensorflow as tf
 import keras.backend as K
 
 from ddpg import DDPG
+from wolpertinger import Wolpertinger
 
 import gym
 
@@ -14,7 +15,9 @@ def main():
     K.set_session(sess)
 
     env = gym.make('Pendulum-v0')
-    ddpg = DDPG(env, sess)
+    # env = gym.make('BipedalWalker-v2')
+    # ddpg = DDPG(env, sess)
+    ddpg = Wolpertinger(env, sess, low_list=[-2], high_list=[2], points_list=[1000])
 
     num_episodes = 200
     max_episode_len = 1000
@@ -28,6 +31,7 @@ def main():
             current_state = current_state.reshape((1, ddpg.state_dim))
             action = ddpg.act(current_state)
             action = action.reshape((1, ddpg.action_dim))
+            print('DEBUG ACTION: ', action)
 
             next_state, reward, done, info = env.step(action)
             next_state = next_state.reshape((1, ddpg.state_dim))

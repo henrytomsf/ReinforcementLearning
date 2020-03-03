@@ -25,6 +25,7 @@ class DDPG:
 
         self.state_dim = self.env.observation_space.shape[0]
         self.action_dim = 1 #self.env.action_space, make this into input
+        self.continuous_action_space = True
 
         # Initialize replay buffer
         self.replay_buffer = ReplayBuffer(self.buffer_size)

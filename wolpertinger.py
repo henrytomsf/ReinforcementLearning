@@ -13,7 +13,7 @@ class Wolpertinger(DDPG):
                  high_list,
                  points_list, # points in each dimension
                  k_ratio=0.1):
-        super().__init__(env, sess)
+        super().__init__(env, sess, low_list, high_list)
         if self.continuous_action_space:
             self.action_space = action_space.Space(low_list, high_list, points_list)
             max_actions = self.action_space.get_num_actions()

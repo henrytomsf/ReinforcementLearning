@@ -14,10 +14,11 @@ def main():
     sess = tf.Session()
     K.set_session(sess)
 
-    env = gym.make('Pendulum-v0')
+    # env = gym.make('Pendulum-v0')
     # env = gym.make('BipedalWalker-v2')
-    # ddpg = DDPG(env, sess)
-    ddpg = Wolpertinger(env, sess, low_list=[-2], high_list=[2], points_list=[1000])
+    env = gym.make('LunarLanderContinuous-v2')
+    ddpg = DDPG(env, sess, low_action_bound_list=[-1,-1], high_action_bound_list=[1,1])
+    # ddpg = Wolpertinger(env, sess, low_list=[-1, -1], high_list=[1, 1], points_list=[1000])
 
     num_episodes = 200
     max_episode_len = 1000
@@ -30,8 +31,10 @@ def main():
         for step in range(max_episode_len):
             current_state = current_state.reshape((1, ddpg.state_dim))
             action = ddpg.act(current_state)
-            action = action.reshape((1, ddpg.action_dim))
-            print('DEBUG ACTION: ', action)
+            if ddpg.action_dim == 1:
+                action = action.reshape((1, ddpg.action_dim))
+            elif ddpg.action_dim > 1:
+                action = action.reshape((1, ddpg.action_dim))[0]
 
             next_state, reward, done, info = env.step(action)
             next_state = next_state.reshape((1, ddpg.state_dim))
@@ -59,7 +62,10 @@ def main():
                 env.render()
                 current_state = current_state.reshape((1, ddpg.state_dim))
                 action = ddpg.act(current_state)
-                action = action.reshape((1, ddpg.action_dim))
+                if ddpg.action_dim == 1:
+                    action = action.reshape((1, ddpg.action_dim))
+                elif ddpg.action_dim > 1:
+                    action = action.reshape((1, ddpg.action_dim))[0]
 
                 next_state, reward, done, info = env.step(action)
                 next_state = next_state.reshape((1, ddpg.state_dim))

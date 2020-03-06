@@ -10,16 +10,21 @@ import gym
 
 
 
-def main():
+def main(b_wolpertinger=True):
     sess = tf.Session()
     K.set_session(sess)
 
+    # Define environment
     # env = gym.make('Pendulum-v0')
     # env = gym.make('BipedalWalker-v2')
     env = gym.make('LunarLanderContinuous-v2')
-    ddpg = DDPG(env, sess, low_action_bound_list=[-1,-1], high_action_bound_list=[1,1])
-    # ddpg = Wolpertinger(env, sess, low_list=[-1, -1], high_list=[1, 1], points_list=[1000])
 
+    if b_wolpertinger:
+        ddpg = Wolpertinger(env, sess, low_list=[-1, -1], high_list=[1, 1], points_list=[1000])
+    else:
+        ddpg = DDPG(env, sess, low_action_bound_list=[-1,-1], high_action_bound_list=[1,1])
+
+    # Main loop
     num_episodes = 200
     max_episode_len = 1000
 

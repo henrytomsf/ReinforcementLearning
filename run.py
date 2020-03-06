@@ -9,7 +9,6 @@ import gym
 
 
 
-
 def main(env_name='LunarLanderContinuous-v2',
          low_list=[-1, -1],
          high_list=[1, 1],

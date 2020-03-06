@@ -10,19 +10,22 @@ import gym
 
 
 
-def main(b_wolpertinger=True):
+def main(env_name='LunarLanderContinuous-v2',
+         low_list=[-1, -1],
+         high_list=[1, 1],
+         b_wolpertinger=True):
     sess = tf.Session()
     K.set_session(sess)
 
     # Define environment
     # env = gym.make('Pendulum-v0')
     # env = gym.make('BipedalWalker-v2')
-    env = gym.make('LunarLanderContinuous-v2')
+    env = gym.make(env_name)
 
     if b_wolpertinger:
-        ddpg = Wolpertinger(env, sess, low_list=[-1, -1], high_list=[1, 1], points_list=[1000])
+        ddpg = Wolpertinger(env, sess, low_list=low_list, high_list=high_list, points_list=[1000])
     else:
-        ddpg = DDPG(env, sess, low_action_bound_list=[-1,-1], high_action_bound_list=[1,1])
+        ddpg = DDPG(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
 
     # Main loop
     num_episodes = 200

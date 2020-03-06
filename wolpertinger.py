@@ -14,15 +14,19 @@ class Wolpertinger(DDPG):
                  points_list, # points in each dimension
                  k_ratio=0.1):
         super().__init__(env, sess, low_list, high_list)
+        self.k_ratio = k_ratio
         if self.continuous_action_space:
             self.action_space = action_space.Space(low_list, high_list, points_list)
-            max_actions = self.action_space.get_num_actions()
+            self.max_actions = self.action_space.get_num_actions()
         else:
             assert len(points_list)==1
-            max_actions = points_list[0]
-            self.action_space = action_space.Discrete(max_actions)
+            self.max_actions = points_list[0]
+            self.action_space = action_space.Discrete(self.max_actions)
         
-        self.knn = max(1, int(max_actions * k_ratio))
+        self.knn = max(1, int(self.max_actions * self.k_ratio))
+    
+    def __repr__(self):
+        return 'Wolpertinger_maxactions{}_kratio{}'.format(self.max_actions, self.k_ratio)
 
     def get_action_space(self):
         return self.action_space

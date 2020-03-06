@@ -85,4 +85,4 @@ def main(env_name='LunarLanderContinuous-v2',
 
 
 if __name__ == '__main__':
-    main()
+    main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], b_wolpertinger=True)

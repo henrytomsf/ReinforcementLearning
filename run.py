@@ -9,16 +9,24 @@ import gym
 
 
 
-
-def main():
+def main(env_name='LunarLanderContinuous-v2',
+         low_list=[-1, -1],
+         high_list=[1, 1],
+         b_wolpertinger=True):
     sess = tf.Session()
     K.set_session(sess)
 
-    env = gym.make('Pendulum-v0')
+    # Define environment
+    # env = gym.make('Pendulum-v0')
     # env = gym.make('BipedalWalker-v2')
-    # ddpg = DDPG(env, sess)
-    ddpg = Wolpertinger(env, sess, low_list=[-2], high_list=[2], points_list=[1000])
+    env = gym.make(env_name)
 
+    if b_wolpertinger:
+        ddpg = Wolpertinger(env, sess, low_list=low_list, high_list=high_list, points_list=[1000])
+    else:
+        ddpg = DDPG(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
+
+    # Main loop
     num_episodes = 200
     max_episode_len = 1000
 
@@ -30,8 +38,10 @@ def main():
         for step in range(max_episode_len):
             current_state = current_state.reshape((1, ddpg.state_dim))
             action = ddpg.act(current_state)
-            action = action.reshape((1, ddpg.action_dim))
-            print('DEBUG ACTION: ', action)
+            if ddpg.action_dim == 1:
+                action = action.reshape((1, ddpg.action_dim))
+            elif ddpg.action_dim > 1:
+                action = action.reshape((1, ddpg.action_dim))[0]
 
             next_state, reward, done, info = env.step(action)
             next_state = next_state.reshape((1, ddpg.state_dim))
@@ -59,7 +69,10 @@ def main():
                 env.render()
                 current_state = current_state.reshape((1, ddpg.state_dim))
                 action = ddpg.act(current_state)
-                action = action.reshape((1, ddpg.action_dim))
+                if ddpg.action_dim == 1:
+                    action = action.reshape((1, ddpg.action_dim))
+                elif ddpg.action_dim > 1:
+                    action = action.reshape((1, ddpg.action_dim))[0]
 
                 next_state, reward, done, info = env.step(action)
                 next_state = next_state.reshape((1, ddpg.state_dim))
@@ -72,4 +85,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], b_wolpertinger=True)

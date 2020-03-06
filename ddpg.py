@@ -11,10 +11,14 @@ import tensorflow as tf
 class DDPG:
     def __init__(self,
                  env,
-                 sess):
+                 sess,
+                 low_action_bound_list,
+                 high_action_bound_list):
         self.env = env
         self.sess = sess
-        self.action_bound = 2.0 # depends on the env
+        self.low_action_bound_list = low_action_bound_list # depends on the env
+        self.high_action_bound_list = high_action_bound_list
+        self.action_range_bound = [hi-lo for hi,lo in zip(self.high_action_bound_list, self.low_action_bound_list)]
         self.learning_rate = 0.0001
         self.epsilon = 0.9
         self.epsilon_decay = 0.99995
@@ -24,7 +28,7 @@ class DDPG:
         self.batch_size = 128
 
         self.state_dim = self.env.observation_space.shape[0]
-        self.action_dim = 1 #self.env.action_space, make this into input
+        self.action_dim = len(self.low_action_bound_list) #self.env.action_space, make this into input
         self.continuous_action_space = True
 
         # Initialize replay buffer
@@ -51,6 +55,9 @@ class DDPG:
         self.critic_grads = tf.gradients(self.critic_model.output, self.critic_action_input)
 
         self.sess.run(tf.initialize_all_variables())
+
+    def __repr__(self):
+        return 'DDPG_gamma{}_tau{}'.format(self.gamma, self.tau)
 
     # TRAINING FUNCTIONS
     def train_actor(self,
@@ -113,6 +120,6 @@ class DDPG:
             current_state):
         self.epsilon *= self.epsilon_decay
         if np.random.random() < self.epsilon:
-            return self.actor_model.predict(current_state)*self.action_bound + np.random.normal() # TODO make action_bound general for all dimensions
+            return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + np.random.normal() # TODO make action_bound_list general for all dimensions
         else:
-            return self.actor_model.predict(current_state)*self.action_bound
+            return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list

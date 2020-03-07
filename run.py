@@ -12,6 +12,7 @@ import gym
 def main(env_name='LunarLanderContinuous-v2',
          low_list=[-1, -1],
          high_list=[1, 1],
+         pts_list=[1000,1000],
          b_wolpertinger=True):
     sess = tf.Session()
     K.set_session(sess)
@@ -22,7 +23,7 @@ def main(env_name='LunarLanderContinuous-v2',
     env = gym.make(env_name)
 
     if b_wolpertinger:
-        ddpg = Wolpertinger(env, sess, low_list=low_list, high_list=high_list, points_list=[1000])
+        ddpg = Wolpertinger(env, sess, low_list=low_list, high_list=high_list, points_list=pts_list)
     else:
         ddpg = DDPG(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
 
@@ -85,4 +86,5 @@ def main(env_name='LunarLanderContinuous-v2',
 
 
 if __name__ == '__main__':
-    main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], b_wolpertinger=True)
+    # main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], pts_list=[1000], b_wolpertinger=True)
+    main(env_name='LunarLanderContinuous-v2', low_list=[-1, -1], high_list=[1, 1], pts_list=[1000,1000], b_wolpertinger=False)

@@ -2,6 +2,7 @@ import numpy as np
 
 from actor import Actor
 from critic import Critic
+from OU import OrnsteinUhlenbeckProcess
 from replaybuffer import ReplayBuffer
 
 import tensorflow as tf
@@ -26,6 +27,10 @@ class DDPG:
         self.tau = 0.01
         self.buffer_size = 100000
         self.batch_size = 128
+        self.theta = 0.15
+        self.ou = 0
+        self.sigma = 0.3
+        self.exploration_episodes = 150
 
         self.state_dim = self.env.observation_space.shape[0]
         self.action_dim = len(self.low_action_bound_list) #self.env.action_space, make this into input
@@ -53,6 +58,8 @@ class DDPG:
         _, _, self.target_critic_model = critic_.create_critic_model()
 
         self.critic_grads = tf.gradients(self.critic_model.output, self.critic_action_input)
+
+        self.noise = OrnsteinUhlenbeckProcess(theta=self.theta, mu=self.ou, sigma=self.sigma, n_steps_annealing=self.exploration_episodes)
 
         self.sess.run(tf.initialize_all_variables())
 
@@ -117,9 +124,9 @@ class DDPG:
 
     # ACTING FUNCTION with epsilon greedy
     def act(self,
+            current_epsiode,
             current_state):
-        self.epsilon *= self.epsilon_decay
-        if np.random.random() < self.epsilon:
-            return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + np.random.normal() # TODO make action_bound_list general for all dimensions
+        if current_epsiode < self.exploration_episodes:
+            return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + self.noise.generate(current_epsiode)
         else:
             return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list

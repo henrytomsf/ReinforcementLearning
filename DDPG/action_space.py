@@ -57,11 +57,11 @@ class Space:
     def import_point(self,
                      point):
         # get point relative to low with scaling from range
-        return (point - self._low) / self._range
+        return point
 
     def export_point(self,
                      point):
-        return self._low + point * self._range
+        return point
 
     def shape(self):
         return self._space.shape

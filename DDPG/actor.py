@@ -5,6 +5,8 @@ from keras.layers.merge import Add, Concatenate
 from keras.optimizers import Adam
 import keras.backend as K
 
+K.set_learning_phase(1)
+
 import tensorflow as tf
 
 
@@ -21,11 +23,9 @@ class Actor:
     def create_actor_model(self):
         state_input = Input(shape=[self.state_dim])
         h1 = Dense(500, activation='relu')(state_input)
-        h1_b = BatchNormalization()(h1)
-        h2 = Dense(200, activation='relu')(h1_b)
-        h2_b = BatchNormalization()(h2)
+        h2 = Dense(200, activation='relu')(h1)
 
-        output = Dense(self.action_dim, activation='tanh')(h2_b)
+        output = Dense(self.action_dim, activation='tanh')(h2)
 
         model = Model(input=state_input, output=output)
         adam = Adam(lr=self.learning_rate)

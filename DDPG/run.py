@@ -29,7 +29,7 @@ def main(env_name='LunarLanderContinuous-v2',
 
     # Main loop
     num_episodes = 200
-    max_episode_len = 1000
+    max_episode_len = 500
 
     for i in range(num_episodes):
         total_reward = 0
@@ -52,7 +52,7 @@ def main(env_name='LunarLanderContinuous-v2',
             #     done = True
             #     print('Reward: ', total_reward)
 
-            if (step % 5) == 0:
+            if (step % 2) == 0:
                 ddpg.train()
                 ddpg.update_target_models()
             
@@ -86,5 +86,5 @@ def main(env_name='LunarLanderContinuous-v2',
 
 
 if __name__ == '__main__':
-    main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], pts_list=[1000], b_wolpertinger=False)
-    # main(env_name='LunarLanderContinuous-v2', low_list=[-1, -1], high_list=[1, 1], pts_list=[1000,1000], b_wolpertinger=False)
+    # main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], pts_list=[1000], b_wolpertinger=True)
+    main(env_name='LunarLanderContinuous-v2', low_list=[-1, -1], high_list=[1, 1], pts_list=[500,500], b_wolpertinger=True)

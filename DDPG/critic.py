@@ -5,6 +5,8 @@ from keras.layers.merge import Add, Concatenate
 from keras.optimizers import Adam
 import keras.backend as K
 
+K.set_learning_phase(1)
+
 import tensorflow as tf
 
 
@@ -21,18 +23,14 @@ class Critic:
     def create_critic_model(self):
         state_input = Input(shape=[self.state_dim])
         state_h1 = Dense(500, activation='relu')(state_input)
-        h1_b = BatchNormalization()(state_h1)
-        state_h2 = Dense(200, activation='relu')(h1_b)
-        h2_b = BatchNormalization()(state_h2)
+        state_h2 = Dense(200, activation='relu')(state_h1)
 
         action_input = Input(shape=[self.action_dim])
         action_h1 = Dense(500)(action_input)
-        a_b = BatchNormalization()(action_h1)
 
-        merged = Concatenate()([h2_b, a_b])
+        merged = Concatenate()([state_h2, action_h1])
         merged_h1 = Dense(200, activation='relu')(merged)
-        m_b = BatchNormalization()(merged_h1)
-        output = Dense(1, activation='linear')(m_b)
+        output = Dense(1, activation='linear')(merged_h1)
         model = Model(input=[state_input, action_input], output=output)
 
         adam = Adam(lr=self.learning_rate)

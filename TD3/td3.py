@@ -21,14 +21,14 @@ class TD3:
         self.high_action_bound_list = high_action_bound_list
         self.action_range_bound = [hi-lo for hi,lo in zip(self.high_action_bound_list, self.low_action_bound_list)]
         self.learning_rate = 0.0001
-        self.epsilon = 0.9
-        self.epsilon_decay = 0.99995
+        self.exploration_noise = 0.1
         self.gamma = 0.90
         self.tau = 0.01
-        self.buffer_size = 100000
+        self.buffer_size = 10000
         self.batch_size = 128
         self.policy_noise = 0.1
         self.noise_clip = 0.05
+        self.exploration_episodes = 50
         # self.policy_freq = 2
 
         self.state_dim = self.env.observation_space.shape[0]
@@ -54,10 +54,10 @@ class TD3:
         # Creating FIRST CRITIC model, this is the one we train/optimize against
         critic_ = Critic(self.state_dim, self.action_dim, self.learning_rate)
         self.critic_state_input, self.critic_action_input, self.critic_model = critic_.create_critic_model()
-        self.critic_model.compile(optimizer=Adam(lr=critic_.learning_rate))
+        self.critic_model.compile(optimizer=Adam(lr=critic_.learning_rate), loss='')
 
         _, _, self.target_critic_model = critic_.create_critic_model()
-        self.target_critic_model.compile(optimizer=Adam(lr=critic_.learning_rate))
+        self.target_critic_model.compile(optimizer=Adam(lr=critic_.learning_rate), loss='')
 
         self.critic_grads = tf.gradients(self.critic_model.output[0], self.critic_action_input)
 
@@ -140,9 +140,10 @@ class TD3:
 
     # ACTING FUNCTION with epsilon greedy
     def act(self,
+            current_epsiode,
             current_state):
-        self.epsilon *= self.epsilon_decay
-        if np.random.random() < self.epsilon:
-            return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + np.random.normal() # TODO make action_bound_list general for all dimensions
+        if current_epsiode < self.exploration_episodes:
+            return np.random.uniform(self.low_action_bound_list, self.high_action_bound_list)
         else:
-            return self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list
+            action = self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + np.random.normal(0, [self.exploration_noise*hi for hi in self.high_action_bound_list])
+            return np.clip(action, self.low_action_bound_list, self.high_action_bound_list)

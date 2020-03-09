@@ -12,7 +12,7 @@ class Wolpertinger(DDPG):
                  low_list,
                  high_list,
                  points_list, # points in each dimension
-                 k_ratio=0.1):
+                 k_ratio=0.01):
         super().__init__(env, sess, low_list, high_list)
         self.k_ratio = k_ratio
         if self.continuous_action_space:
@@ -31,8 +31,8 @@ class Wolpertinger(DDPG):
     def get_action_space(self):
         return self.action_space
 
-    def act(self, state):
-        proto_action = super().act(state)
+    def act(self, current_episode, state):
+        proto_action = super().act(current_episode, state)
 
         return self.wolpertinger_action(state, proto_action)
     

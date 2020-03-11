@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from collections import deque
 import keras.backend as K
 
 from td3 import TD3
@@ -8,11 +9,10 @@ import gym
 
 
 
-def main(env_name='LunarLanderContinuous-v2',
-         low_list=[-1, -1],
-         high_list=[1, 1],
-         pts_list=[1000,1000],
-         modeltype='wolpertinger'):
+def main(env_name,
+         low_list,
+         high_list,
+         pts_list):
     sess = tf.Session()
     K.set_session(sess)
 

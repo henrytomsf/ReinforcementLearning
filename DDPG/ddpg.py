@@ -20,17 +20,17 @@ class DDPG:
         self.low_action_bound_list = low_action_bound_list # depends on the env
         self.high_action_bound_list = high_action_bound_list
         self.action_range_bound = [hi-lo for hi,lo in zip(self.high_action_bound_list, self.low_action_bound_list)]
-        self.learning_rate = 0.0001
-        self.epsilon = 0.9
-        self.epsilon_decay = 0.99995
-        self.gamma = 0.90
-        self.tau = 0.01
-        self.buffer_size = 100000
+        self.learning_rate = 0.0001 #TODO move these to configs
+        self.epsilon = 1.0
+        self.epsilon_min = 0.1
+        self.epsilon_decay = 1e-6
+        self.gamma = 0.99
+        self.tau = 0.001
+        self.buffer_size = 1000000
         self.batch_size = 128
         self.theta = 0.15
         self.ou = 0
         self.sigma = 0.3
-        self.exploration_episodes = 150
 
         self.state_dim = self.env.observation_space.shape[0]
         self.action_dim = len(self.low_action_bound_list) #self.env.action_space, make this into input
@@ -59,7 +59,8 @@ class DDPG:
 
         self.critic_grads = tf.gradients(self.critic_model.output, self.critic_action_input)
 
-        self.noise = OrnsteinUhlenbeckProcess(theta=self.theta, mu=self.ou, sigma=self.sigma, n_steps_annealing=self.exploration_episodes)
+        self.noise = OrnsteinUhlenbeckProcess(size=self.action_dim)
+        self.noise.reset()
 
         self.sess.run(tf.initialize_all_variables())
 
@@ -83,6 +84,11 @@ class DDPG:
             self.actor_critic_grad: grads
         })
 
+        if self.epsilon - self.epsilon_decay > self.epsilon_min:
+            self.epsilon -= self.epsilon_decay
+
+        self.noise.reset()
+
     def train_critic(self,
                      samples):
         current_states, actions, rewards, next_states, dones = samples
@@ -93,7 +99,6 @@ class DDPG:
         rewards = rewards + self.gamma * target_q_values * (1-dones)
 
         evaluation = self.critic_model.fit([current_states, actions], rewards, verbose=0)
-        # print('Evaluation: ', evaluation)
     
     def train(self):
         if self.replay_buffer.size() > self.batch_size:
@@ -122,13 +127,10 @@ class DDPG:
         self.update_actor_target()
         self.update_critic_target()
 
-    # ACTING FUNCTION with epsilon greedy
+    # ACTING FUNCTION
     def act(self,
             current_epsiode,
             current_state):
-        if current_epsiode < self.exploration_episodes:
-            action = self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + self.noise.generate(current_epsiode)
-            return np.clip(action, self.low_action_bound_list, self.high_action_bound_list)
-        else:
-            action = self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list
-            return np.clip(action, self.low_action_bound_list, self.high_action_bound_list)
+        noise = self.epsilon * self.noise.generate()
+        action = self.actor_model.predict(current_state)*self.high_action_bound_list + noise #TODO add linear mapping for affine space
+        return np.clip(action, self.low_action_bound_list, self.high_action_bound_list)

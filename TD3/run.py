@@ -21,12 +21,7 @@ def main(env_name,
     # env = gym.make('BipedalWalker-v2')
     env = gym.make(env_name)
 
-    if modeltype == 'wolpertinger':
-        ddpg = Wolpertinger(env, sess, low_list=low_list, high_list=high_list, points_list=pts_list)
-    elif modeltype == 'ddpg':
-        ddpg = DDPG(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
-    elif modeltype == 'td3':
-        ddpg = TD3(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
+    ddpg = TD3(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
 
     # Main loop
     num_episodes = 200

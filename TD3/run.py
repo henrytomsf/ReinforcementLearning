@@ -22,7 +22,7 @@ def main(env_name,
     td3 = TD3(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
 
     # Main loop
-    num_episodes = 200
+    num_episodes = 2000
     max_episode_len = 1000
 
     scores_deque = deque(maxlen=50)

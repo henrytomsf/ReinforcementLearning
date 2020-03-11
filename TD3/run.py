@@ -43,15 +43,15 @@ def main(env_name,
             next_state = next_state.reshape((1, td3.state_dim))
             total_reward += reward
 
+            td3.replay_buffer.add(current_state, action, reward, next_state, done)
+            current_state = next_state
+
             td3.train_critic()
 
             # Delayed training for policy
             if (step % 2) == 0:
                 td3.train_actor()
                 td3.update_target_models()
-
-            td3.replay_buffer.add(current_state, action, reward, next_state, done)
-            current_state = next_state
 
             if done:
                 break

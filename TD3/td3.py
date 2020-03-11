@@ -145,5 +145,6 @@ class TD3:
         if current_epsiode < self.exploration_episodes:
             return np.random.uniform(self.low_action_bound_list, self.high_action_bound_list)
         else:
-            action = self.actor_model.predict(current_state)*self.action_range_bound + self.low_action_bound_list + np.random.normal(0, [self.exploration_noise*hi for hi in self.high_action_bound_list])
+            # TODO add mapping for affine space, just in case
+            action = self.actor_model.predict(current_state) + np.random.normal(0, [self.exploration_noise*hi for hi in self.high_action_bound_list])
             return np.clip(action, self.low_action_bound_list, self.high_action_bound_list)

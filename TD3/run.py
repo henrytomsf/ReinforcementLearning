@@ -25,6 +25,7 @@ def main(env_name,
     num_episodes = 200
     max_episode_len = 1000
 
+    scores_deque = deque(maxlen=50)
     for i in range(num_episodes):
         total_reward = 0
 
@@ -55,9 +56,16 @@ def main(env_name,
             if done:
                 break
 
-        print('Total Reward for episode {}: {}'.format(i, total_reward))
+        scores_deque.append(total_reward)
+        score_average = np.mean(scores_deque)
 
-        if i == (num_episodes-1):
+        print('Episode {}, Reward {}, Avg reward:{}'.format(i, total_reward, score_average))
+
+        if score_average >= -300:
+
+            td3.actor_model.save_weights('model_{}.h5'.format(env_name))
+
+            # Display when finished
             current_state = env.reset()
             for step in range(1000):
                 env.render()

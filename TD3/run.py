@@ -37,12 +37,10 @@ def main(env_name,
                 action = action.reshape((1, ddpg.action_dim))
             elif ddpg.action_dim > 1:
                 action = action.reshape((1, ddpg.action_dim))[0]
-                print('DEBUG ACTION: ', action)
 
             next_state, reward, done, info = env.step(action)
             next_state = next_state.reshape((1, ddpg.state_dim))
             total_reward += reward
-
 
 
             ddpg.train_critic()

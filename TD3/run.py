@@ -19,7 +19,7 @@ def main(env_name,
     # Define environment
     env = gym.make(env_name)
 
-    ddpg = TD3(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
+    td3 = TD3(env, sess, low_action_bound_list=low_list, high_action_bound_list=high_list)
 
     # Main loop
     num_episodes = 200
@@ -31,25 +31,25 @@ def main(env_name,
         current_state = env.reset()
 
         for step in range(max_episode_len):
-            current_state = current_state.reshape((1, ddpg.state_dim))
-            action = ddpg.act(i, current_state)
-            if ddpg.action_dim == 1:
-                action = action.reshape((1, ddpg.action_dim))
-            elif ddpg.action_dim > 1:
-                action = action.reshape((1, ddpg.action_dim))[0]
+            current_state = current_state.reshape((1, td3.state_dim))
+            action = td3.act(i, current_state)
+            if td3.action_dim == 1:
+                action = action.reshape((1, td3.action_dim))
+            elif td3.action_dim > 1:
+                action = action.reshape((1, td3.action_dim))[0]
 
             next_state, reward, done, info = env.step(action)
-            next_state = next_state.reshape((1, ddpg.state_dim))
+            next_state = next_state.reshape((1, td3.state_dim))
             total_reward += reward
 
+            td3.train_critic()
 
-            ddpg.train_critic()
-
+            # Delayed training for policy
             if (step % 2) == 0:
-                ddpg.train_actor()
-                ddpg.update_target_models()
+                td3.train_actor()
+                td3.update_target_models()
 
-            ddpg.replay_buffer.add(current_state, action, reward, next_state, done)
+            td3.replay_buffer.add(current_state, action, reward, next_state, done)
             current_state = next_state
 
             if done:
@@ -61,15 +61,15 @@ def main(env_name,
             current_state = env.reset()
             for step in range(1000):
                 env.render()
-                current_state = current_state.reshape((1, ddpg.state_dim))
-                action = ddpg.act(i, current_state)
-                if ddpg.action_dim == 1:
-                    action = action.reshape((1, ddpg.action_dim))
-                elif ddpg.action_dim > 1:
-                    action = action.reshape((1, ddpg.action_dim))[0]
+                current_state = current_state.reshape((1, td3.state_dim))
+                action = td3.act(i, current_state)
+                if td3.action_dim == 1:
+                    action = action.reshape((1, td3.action_dim))
+                elif td3.action_dim > 1:
+                    action = action.reshape((1, td3.action_dim))[0]
 
                 next_state, reward, done, info = env.step(action)
-                next_state = next_state.reshape((1, ddpg.state_dim))
+                next_state = next_state.reshape((1, td3.state_dim))
 
                 current_state = next_state
 

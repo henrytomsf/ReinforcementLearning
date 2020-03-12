@@ -48,7 +48,7 @@ class Critic:
 
         model = Model(input=[state_input, action_input, target_q], output=[output1, output2])
 
-        loss = K.mean(mse(output1, target_q) * mse(output2, target_q))
+        loss = K.mean(mse(output1, target_q) + mse(output2, target_q))
         model.add_loss(loss)
 
         return state_input, action_input, model

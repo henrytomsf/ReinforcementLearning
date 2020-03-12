@@ -83,6 +83,8 @@ def main(env_name,
                 if done:
                     break
 
+            break
+
 
 
 if __name__ == '__main__':

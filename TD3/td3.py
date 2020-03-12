@@ -28,7 +28,7 @@ class TD3:
         self.batch_size = 128
         self.policy_noise = 0.1
         self.noise_clip = 0.05
-        self.exploration_episodes = 50
+        self.exploration_episodes = 10
         # self.policy_freq = 2
 
         self.state_dim = self.env.observation_space.shape[0]
@@ -73,7 +73,7 @@ class TD3:
 
             current_states, actions, rewards, next_states, dones = samples
 
-            predicted_actions = self.actor_model.predict(current_states)
+            predicted_actions = self.actor_model.predict(current_states)*self.high_action_bound_list #TODO create linear mapping for affine space
 
             grads = self.sess.run(self.critic_grads, feed_dict={
                 self.critic_state_input: current_states,
@@ -91,7 +91,7 @@ class TD3:
 
             current_states, actions, rewards, next_states, dones = samples
 
-            target_actions = self.target_actor_model.predict(next_states)
+            target_actions = self.target_actor_model.predict(next_states)*self.high_action_bound_list
 
             # CCOMPUTING FIRST CRITIC
             # introduce area of noise to action for smoothing purposes
@@ -108,8 +108,8 @@ class TD3:
 
             # current_q1, current_q2 = self.critic_model.predict([current_states, actions, np.random.rand(self.batch_size, 1)])
 
-            self.critic_model.fit([current_states, actions, target_q], verbose=0)
-            # print('Evaluation: ', evaluation)
+            history = self.critic_model.fit([current_states, actions, target_q], verbose=0)
+            # print('Loss: ',history.history['loss'])
 
     def train(self):
         if self.replay_buffer.size() > self.batch_size:
@@ -143,8 +143,7 @@ class TD3:
             current_epsiode,
             current_state):
         if current_epsiode < self.exploration_episodes:
-            return np.random.uniform(self.low_action_bound_list, self.high_action_bound_list)
+            return np.random.uniform(self.low_action_bound_list, self.high_action_bound_list)*self.high_action_bound_list
         else:
-            # TODO add mapping for affine space, just in case
-            action = self.actor_model.predict(current_state) + np.random.normal(0, [self.exploration_noise*hi for hi in self.high_action_bound_list])
+            action = self.actor_model.predict(current_state)*self.high_action_bound_list + np.random.normal(0, [self.exploration_noise*hi for hi in self.high_action_bound_list])
             return np.clip(action, self.low_action_bound_list, self.high_action_bound_list)

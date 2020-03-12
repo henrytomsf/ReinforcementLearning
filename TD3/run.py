@@ -11,8 +11,7 @@ import gym
 
 def main(env_name,
          low_list,
-         high_list,
-         pts_list):
+         high_list):
     sess = tf.Session()
     K.set_session(sess)
 
@@ -89,4 +88,4 @@ def main(env_name,
 
 
 if __name__ == '__main__':
-    main(env_name='Pendulum-v0', low_list=[-2], high_list=[2], pts_list=[1000])
+    main(env_name='Pendulum-v0', low_list=[-2], high_list=[2])

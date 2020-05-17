@@ -5,4 +5,6 @@
 2. Wolpertinger DDPG
 3. Twin Delayed DDPG (TD3)
 
+### Details
+
 Thank you to @jimkon @piotrplata, and @sfujim for the research papers, inspiration and tutorial!

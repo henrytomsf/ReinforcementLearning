@@ -8,6 +8,6 @@
 3. Twin Delayed DDPG (TD3)
 
 ### Details
-More to come!!
+More to come!!!
 
 Thank you to @jimkon @piotrplata, and @sfujim for the research papers, inspiration and tutorial!

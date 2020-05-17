@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/henrytomsf/ReinforcementLearning.svg?branch=develop)](https://travis-ci.org/henrytomsf/ReinforcementLearning)
+
 # Reinforcement Learning
 
 ### Algorithms

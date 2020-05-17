@@ -6,7 +6,6 @@ Keras==2.2.4
 Keras-Applications==1.0.7
 Keras-Preprocessing==1.0.9
 matplotlib==3.0.3
-my-gym-torcs==0.0.1
 numpy==1.16.2
 pyflann-py3==0.1.0
 scikit-learn==0.21.2

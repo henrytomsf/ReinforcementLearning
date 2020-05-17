@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/henrytomsf/ReinforcementLearning.svg?branch=develop)](https://travis-ci.org/henrytomsf/ReinforcementLearning)
+[![Build Status](https://travis-ci.org/henrytomsf/ReinforcementLearning.svg?branch=develop)](https://travis-ci.org/henrytomsf/ReinforcementLearning)[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/henrytomsf/ReinforcementLearning/issues)
 
 # Reinforcement Learning
 
